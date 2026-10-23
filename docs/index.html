@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta content="20261023-clean" name="portfolio-revision"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>DeepSeek 事件研究 · 12 个模型对比</title>
+<meta content="事件前电话会措辞与财务指标：12 个分类模型的 5 折交叉验证分数对比。" name="description"/>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F6F8FA;color:#1F2933;font:14px/1.5 "Segoe UI","Microsoft YaHei","PingFang SC",system-ui,-apple-system,Arial,sans-serif}
+a{color:#3B5BDB;text-underline-offset:2px}
+:focus-visible{outline:2px solid #3B5BDB;outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.top{background:#fff;border-bottom:1px solid #E3E8EE}
+.top-in{max-width:1280px;margin:0 auto;padding:10px 24px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center}
+.top nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+.top nav a{color:#334E68;text-decoration:none}
+.top nav a:hover{text-decoration:underline}
+.lang{display:inline-flex;border:1px solid #CBD2D9;border-radius:6px;overflow:hidden}
+.lang button{font-family:inherit;font-size:13px;font-weight:600;line-height:1;min-height:32px;padding:7px 12px;border:0;background:#fff;color:#334E68;cursor:pointer}
+.lang button+button{border-left:1px solid #CBD2D9}
+.lang button[aria-pressed="true"]{background:#3B5BDB;color:#fff}
+.page{max-width:1280px;margin:0 auto;padding:18px 24px 28px}
+.head h1{font-size:24px;font-weight:600;line-height:1.3;margin:0 0 4px}
+.head p{margin:0;font-size:14px;color:#5B6B7B}
+.wb{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:#fff;border:1px solid #E3E8EE;border-radius:8px}
+.kpis{display:flex;flex-direction:column}
+.kpi{padding:14px 18px;border-bottom:1px solid #E3E8EE}
+.kpi:last-child{border-bottom:0}
+.kpi .l{font-size:12px;color:#5B6B7B}
+.kpi .v{font-size:28px;font-weight:600;line-height:1.25;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:#5B6B7B}
+.kpi.hl .v{color:#3B5BDB}
+.fig{margin:0;padding:14px 20px 12px;min-width:0}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;padding-bottom:10px;border-bottom:1px solid #E3E8EE}
+.grp{display:flex;align-items:center;gap:8px}
+.grp>span{font-size:12px;color:#5B6B7B}
+.seg{display:inline-flex;border:1px solid #CBD2D9;border-radius:6px;overflow:hidden}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;width:1px;height:1px}
+.seg span{display:block;padding:6px 12px;font-size:13px;color:#334E68;cursor:pointer;white-space:nowrap}
+.seg label+label span{border-left:1px solid #CBD2D9}
+.seg input:checked+span{background:#3B5BDB;color:#fff}
+.seg input:focus-visible+span{outline:2px solid #1F2933;outline-offset:-3px}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:#5B6B7B;margin:8px 0 2px}
+.key svg{vertical-align:-2px;margin-right:5px}
+svg text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+.mv{transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .3s;transform-origin:0 0}
+figcaption{font-size:12px;color:#5B6B7B;margin-top:4px}
+details{margin-top:10px;border-top:1px solid #E3E8EE}
+summary{cursor:pointer;padding:8px 0;font-size:13px;font-weight:600;color:#334E68}
+details>div{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 8px;border-bottom:1px solid #E3E8EE;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+thead th{font-size:12px;font-weight:600;color:#5B6B7B}
+.foot{max-width:1280px;margin:0 auto;padding:0 24px 28px;font-size:13px;color:#5B6B7B;display:flex;flex-wrap:wrap;gap:6px 18px}
+@media (max-width:860px){
+  .wb{grid-template-columns:1fr}
+  .kpis{display:grid;grid-template-columns:1fr 1fr}
+  .kpi{border-right:1px solid #E3E8EE}
+  .kpi:nth-child(2n){border-right:0}
+  .kpi:nth-last-child(-n+2){border-bottom:0}
+}
+@media (max-width:520px){
+  .top-in,.page,.foot{padding-left:14px;padding-right:14px}
+  .fig{padding:12px}
+  .kpi{padding:12px}
+  .kpi .v{font-size:24px}
+  .grp{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+/* Portfolio presentation: clearer hierarchy, charts remain the primary content. */
+:root{--project-accent:#355b98}html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:#f5f7fa;font-size:14px;line-height:1.65;color:#202c3b}
+.top{position:sticky;top:0;z-index:20;background:#fff;border-top:3px solid var(--project-accent);box-shadow:0 1px 4px #192d4910}
+.top-in{max-width:1360px;padding:12px 28px}.page{max-width:1360px;padding:28px 28px 40px}
+.head{padding:0 0 22px;margin-bottom:22px;border-bottom:1px solid #dce2ea}
+.head h1{font-size:clamp(25px,2.4vw,34px);line-height:1.3;font-weight:700;letter-spacing:-.5px;margin-bottom:10px}
+.head p{max-width:850px;line-height:1.7;color:#607084}.card{border-color:#dce3eb;border-radius:10px;box-shadow:0 2px 7px #24364b04}
+.card-h{padding:18px 20px;border-bottom:1px solid #e7ecf2}.card-h h2{font-size:18px;font-weight:650}
+.body{padding:18px 20px}.kpi .v{font-size:30px;letter-spacing:-.6px}.kpi .l{font-size:13px}.kpi .s{line-height:1.6}
+.cap,figcaption{line-height:1.65;color:#607084}.seg{background:#f2f5f9}.lang button[aria-pressed="true"]{background:var(--project-accent)}
+table{font-variant-numeric:tabular-nums}tbody tr:nth-child(even){background:#f7f9fc}th{font-weight:600}
+.foot{max-width:1360px;margin:0 auto;padding:20px 28px;border-top:1px solid #dce2ea;font-size:13px}
+.jumpnav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}.jumpnav a{color:#4b5d73;text-decoration:none;font-size:13px;border:1px solid #dce3eb;padding:5px 12px;border-radius:5px;background:#fff}.jumpnav a:hover{color:var(--project-accent);border-color:var(--project-accent)}
+@media(max-width:650px){.page{padding:20px 14px}.top-in{padding:10px 14px}.head h1{font-size:25px}.body,.card-h{padding:14px}.foot{padding:18px 14px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.wb{grid-template-columns:210px minmax(0,1fr);gap:24px}.fig{margin:0}.kpis{border-top:3px solid var(--project-accent)}.ctl{padding:18px}.kpi{padding:20px}@media(max-width:800px){.wb{grid-template-columns:1fr}.kpis{display:grid;grid-template-columns:repeat(2,1fr)}}</style></head>
+<body>
+<header class="top"><div class="top-in">
+<nav data-i18n-attr="aria-label:nav.aria"><a data-i18n="nav.back" href="https://milanchen0307-cmyk.github.io/analytics-portfolio/"></a><a data-i18n="nav.repo" href="https://github.com/milanchen0307-cmyk/deepseek-event-study-ml"></a></nav>
+<div aria-label="语言 / Language" class="lang" role="group"><button aria-pressed="true" data-lang="zh" lang="zh-CN" type="button">中文</button><button aria-pressed="false" data-lang="en" lang="en" type="button">English</button></div>
+</div></header>
+<main class="page">
+<div class="head">
+<h1 data-i18n="h1"></h1>
+<p data-i18n="dek"></p>
+</div>
+<div class="wb">
+<aside class="card kpis" data-i18n-attr="aria-label:kpi.aria" id="dk-kpis"></aside>
+<figure aria-labelledby="dk-chart-title" class="card fig">
+<div class="ctl">
+<div class="grp" data-i18n-attr="aria-label:ctl.metric" role="radiogroup"><span data-i18n="ctl.metric"></span><div class="seg">
+<label><input checked="" name="dk-metric" type="radio" value="roc_auc"/><span data-i18n="m.roc_auc"></span></label><label><input name="dk-metric" type="radio" value="accuracy"/><span data-i18n="m.accuracy"></span></label><label><input name="dk-metric" type="radio" value="f1"/><span data-i18n="m.f1"></span></label>
+</div></div>
+<div class="grp" data-i18n-attr="aria-label:ctl.order" role="radiogroup"><span data-i18n="ctl.order"></span><div class="seg">
+<label><input checked="" name="dk-order" type="radio" value="group"/><span data-i18n="ctl.group"></span></label><label><input name="dk-order" type="radio" value="mean"/><span data-i18n="ctl.mean"></span></label>
+</div></div>
+</div>
+<div aria-hidden="true" class="key" id="dk-key"></div>
+<div id="dk-chart-host"><svg aria-labelledby="dk-chart-title dk-chart-desc" id="dk-chart" role="img"><title data-i18n="chart.title" id="dk-chart-title"></title><desc id="dk-chart-desc"></desc></svg></div>
+<figcaption id="dk-figcap"></figcaption>
+<details>
+<summary data-i18n="data.sum"></summary>
+<div><table><caption class="sr" data-i18n="data.cap"></caption>
+<thead><tr><th data-i18n="th.set" scope="col"></th><th data-i18n="th.model" scope="col"></th><th scope="col">n</th><th data-i18n="th.feat" scope="col"></th><th data-i18n="m.accuracy" scope="col"></th><th scope="col">F1</th><th scope="col">ROC AUC</th></tr></thead>
+<tbody id="dk-table"></tbody></table></div>
+</details>
+</figure>
+</div>
+</main>
+<footer class="foot"><a data-i18n="nav.back" href="https://milanchen0307-cmyk.github.io/analytics-portfolio/"></a><a data-i18n="nav.repo" href="https://github.com/milanchen0307-cmyk/deepseek-event-study-ml"></a><a data-i18n="nav.method" href="https://github.com/milanchen0307-cmyk/deepseek-event-study-ml#readme"></a></footer>
+<script id="dk-data" type="application/json">
+{"metrics":[
+{"feature_set":"X_fin_only","model_name":"logit_l1","n_samples":158,"n_features":8,"accuracy_mean":0.5629032258064516,"accuracy_std":0.0846260404802642,"f1_mean":0.5185578151095392,"f1_std":0.107803291733913,"roc_auc_mean":0.5672395833333332,"roc_auc_std":0.0745953348118663},
+{"feature_set":"X_fin_only","model_name":"logit_l2","n_samples":158,"n_features":8,"accuracy_mean":0.5633064516129032,"accuracy_std":0.0782180117499977,"f1_mean":0.5165492234457751,"f1_std":0.0840394847249853,"roc_auc_mean":0.5616666666666666,"roc_auc_std":0.068175352505404},
+{"feature_set":"X_fin_only","model_name":"random_forest","n_samples":158,"n_features":8,"accuracy_mean":0.5306451612903226,"accuracy_std":0.0792023145729648,"f1_mean":0.5294040374770599,"f1_std":0.0827546069066125,"roc_auc_mean":0.56796875,"roc_auc_std":0.0557573916064049},
+{"feature_set":"X_fin_only","model_name":"xgboost","n_samples":158,"n_features":8,"accuracy_mean":0.5183467741935484,"accuracy_std":0.0482920774025545,"f1_mean":0.4953276608449021,"f1_std":0.072161969325193,"roc_auc_mean":0.5396354166666667,"roc_auc_std":0.0480942136375746},
+{"feature_set":"X_text_only","model_name":"logit_l1","n_samples":154,"n_features":19,"accuracy_mean":0.7462365591397849,"accuracy_std":0.0682096839877579,"f1_mean":0.753257808499744,"f1_std":0.069244186848785,"roc_auc_mean":0.7888888888888889,"roc_auc_std":0.036461970718023},
+{"feature_set":"X_text_only","model_name":"logit_l2","n_samples":154,"n_features":19,"accuracy_mean":0.7333333333333333,"accuracy_std":0.0578650496648331,"f1_mean":0.7420528982820418,"f1_std":0.0521395021146813,"roc_auc_mean":0.7820555555555555,"roc_auc_std":0.0384184240780641},
+{"feature_set":"X_text_only","model_name":"random_forest","n_samples":154,"n_features":19,"accuracy_mean":0.7270967741935485,"accuracy_std":0.1168721741855406,"f1_mean":0.7198847926267281,"f1_std":0.1363747707877583,"roc_auc_mean":0.781611111111111,"roc_auc_std":0.0953930142122253},
+{"feature_set":"X_text_only","model_name":"xgboost","n_samples":154,"n_features":19,"accuracy_mean":0.7208602150537635,"accuracy_std":0.1297856143803346,"f1_mean":0.7138926264542962,"f1_std":0.1557968420243611,"roc_auc_mean":0.7742222222222224,"roc_auc_std":0.0814317103884606},
+{"feature_set":"X_fin_plus_X_text","model_name":"logit_l1","n_samples":154,"n_features":27,"accuracy_mean":0.7273118279569892,"accuracy_std":0.0323982616520713,"f1_mean":0.7156732719613044,"f1_std":0.0568537737854813,"roc_auc_mean":0.7824444444444444,"roc_auc_std":0.0322951282493501},
+{"feature_set":"X_fin_plus_X_text","model_name":"logit_l2","n_samples":154,"n_features":27,"accuracy_mean":0.6946236559139785,"accuracy_std":0.0187479524453362,"f1_mean":0.6928424313296394,"f1_std":0.0408458225129546,"roc_auc_mean":0.7712222222222223,"roc_auc_std":0.0195707012056035},
+{"feature_set":"X_fin_plus_X_text","model_name":"random_forest","n_samples":154,"n_features":27,"accuracy_mean":0.733763440860215,"accuracy_std":0.1105752833252549,"f1_mean":0.7260170462944787,"f1_std":0.1317706112343673,"roc_auc_mean":0.7835,"roc_auc_std":0.0880426033236182},
+{"feature_set":"X_fin_plus_X_text","model_name":"xgboost","n_samples":154,"n_features":27,"accuracy_mean":0.6948387096774195,"accuracy_std":0.0629354756039081,"f1_mean":0.6965259740259742,"f1_std":0.0628172165779422,"roc_auc_mean":0.747,"roc_auc_std":0.0723218116783895}
+]}
+</script>
+<script>
+(function(){
+"use strict";
+var D=JSON.parse(document.getElementById('dk-data').textContent).metrics;
+var NS='http://www.w3.org/2000/svg';
+var README='https://github.com/milanchen0307-cmyk/deepseek-event-study-ml#readme';
+function $(id){return document.getElementById(id);}
+function s(tag,attrs,parent,text){var e=document.createElementNS(NS,tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+function h(tag,attrs,parent,text){var e=document.createElement(tag);if(attrs)for(var k in attrs){if(k==='class')e.className=attrs[k];else e.setAttribute(k,attrs[k]);}if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+function clear(e){while(e.firstChild)e.removeChild(e.firstChild);}
+function each(sel,fn){Array.prototype.forEach.call(document.querySelectorAll(sel),fn);}
+function f3(v){return v.toFixed(3);}
+
+/* ---------- language ---------- */
+var LS_KEY='yc-preview-lang';
+var lang=(function(){try{var v=window.localStorage.getItem(LS_KEY);if(v==='zh'||v==='en')return v;}catch(e){}return 'zh';})();
+var I18N={
+en:{
+'meta.title':'DeepSeek event study · 12-model comparison',
+'meta.desc':'Pre-event earnings-call language vs financials: five-fold cross-validated scores for 12 classifiers.',
+'nav.aria':'Page navigation','nav.back':'← Back to portfolio','nav.repo':'Repository ↗','nav.method':'Method notes ↗',
+'h1':'Earnings-call language vs financials: which better separates firms at the two ends of the DeepSeek shock?',
+'dek':'12 models · 3 feature sets × 4 algorithms · 5-fold cross-validation · labels: top vs bottom 20% of post-event abnormal return',
+'kpi.aria':'Key results',
+'kpi.text':function(m){return 'Best text-only · '+m;},'kpi.comb':function(m){return 'Best finance + text · '+m;},
+'kpi.fin':function(m){return 'Finance-only range · '+m;},'kpi.fin.s':'4 models',
+'kpi.n':'Firms modeled','kpi.n.s':'finance-only / text & combined',
+'ctl.metric':'Metric','ctl.order':'Order','ctl.group':'By feature set','ctl.mean':'By score',
+'m.roc_auc':'ROC AUC','m.accuracy':'Accuracy','m.f1':'F1',
+'chart.title':'Cross-validated model scores with fold standard deviations',
+'data.sum':'View all 12 rows','data.cap':'Cross-validation metrics, mean ± SD across folds',
+'th.set':'Feature set','th.model':'Model','th.feat':'Features',
+'set.X_fin_only':'Finance only','set.X_text_only':'Text only','set.X_fin_plus_X_text':'Finance + text',
+'setShort.X_fin_only':'Finance','setShort.X_text_only':'Text','setShort.X_fin_plus_X_text':'Combined',
+'setCode.X_fin_only':'F','setCode.X_text_only':'T','setCode.X_fin_plus_X_text':'F+T',
+'model.logit_l1':'Logistic (L1)','model.logit_l2':'Logistic (L2)','model.random_forest':'Random forest','model.xgboost':'XGBoost',
+'short.logit_l1':'Logit L1','short.logit_l2':'Logit L2','short.random_forest':'Rand. forest','short.xgboost':'XGBoost',
+'key.sd':'±1 SD across 5 folds',
+'head.n':function(n,nf){return 'n = '+n+' · '+nf+' features';},
+'ref.auc':'0.5 = chance','ref.other':'0.5',
+'axis':function(m){return m+' (mean ± 1 SD)';},
+'cap':function(nF,nT){return 'Dot = mean of 5 folds; whisker = ±1 SD across folds, not a confidence interval. Finance-only n = '+nF+'; text and combined n = '+nT+'. ';},
+'desc':function(m,items){return 'Dot-and-whisker chart of '+m+' for 12 models. '+items.map(function(x){return x[0]+': '+x[1]+' plus or minus '+x[2];}).join('; ')+'.';}
+},
+zh:{
+'meta.title':'DeepSeek 事件研究 · 12 个模型对比',
+'meta.desc':'事件前电话会措辞与财务指标：12 个分类模型的 5 折交叉验证分数对比。',
+'nav.aria':'页面导航','nav.back':'← 返回作品集','nav.repo':'仓库 ↗','nav.method':'方法说明 ↗',
+'h1':'事件前电话会措辞 vs 财务指标：谁更能区分 DeepSeek 冲击后的两端公司',
+'dek':'12 个模型 · 3 组特征 × 4 种算法 · 5 折交叉验证 · 标签：事件后异常收益最高与最低各 20%',
+'kpi.aria':'关键结果',
+'kpi.text':function(m){return '仅文本最佳 · '+m;},'kpi.comb':function(m){return '财务 + 文本最佳 · '+m;},
+'kpi.fin':function(m){return '仅财务范围 · '+m;},'kpi.fin.s':'4 个模型',
+'kpi.n':'建模公司数','kpi.n.s':'仅财务 / 文本与合并',
+'ctl.metric':'指标','ctl.order':'排序','ctl.group':'按特征组','ctl.mean':'按得分',
+'m.roc_auc':'ROC AUC','m.accuracy':'准确率','m.f1':'F1',
+'chart.title':'各模型的交叉验证分数及各折标准差',
+'data.sum':'查看 12 行数据','data.cap':'交叉验证指标：各折平均值 ± 标准差',
+'th.set':'特征组','th.model':'模型','th.feat':'特征数',
+'set.X_fin_only':'仅财务','set.X_text_only':'仅文本','set.X_fin_plus_X_text':'财务 + 文本',
+'setShort.X_fin_only':'财务','setShort.X_text_only':'文本','setShort.X_fin_plus_X_text':'合并',
+'setCode.X_fin_only':'财务','setCode.X_text_only':'文本','setCode.X_fin_plus_X_text':'合并',
+'model.logit_l1':'逻辑回归（L1）','model.logit_l2':'逻辑回归（L2）','model.random_forest':'随机森林','model.xgboost':'XGBoost',
+'short.logit_l1':'逻辑回归 L1','short.logit_l2':'逻辑回归 L2','short.random_forest':'随机森林','short.xgboost':'XGBoost',
+'key.sd':'±1 个标准差（5 折之间）',
+'head.n':function(n,nf){return 'n = '+n+' · '+nf+' 项特征';},
+'ref.auc':'0.5 = 随机水平','ref.other':'0.5',
+'axis':function(m){return m+'（平均值 ± 1 个标准差）';},
+'cap':function(nF,nT){return '点 = 5 折平均值；横线 = 各折之间 ±1 个标准差，不是置信区间。仅财务 n = '+nF+'；文本与合并 n = '+nT+'。';},
+'desc':function(m,items){return '12 个模型的 '+m+' 点线图。'+items.map(function(x){return x[0]+'：'+x[1]+'，正负 '+x[2];}).join('；')+'。';}
+}};
+function T(k){var v=I18N[lang][k];if(v==null)v=I18N.en[k];if(v==null)return k;if(typeof v==='function')return v.apply(null,Array.prototype.slice.call(arguments,1));return v;}
+function applyStatic(){
+  document.documentElement.lang=lang==='zh'?'zh-CN':'en';
+  document.title=T('meta.title');
+  var md=document.querySelector('meta[name="description"]');if(md)md.setAttribute('content',T('meta.desc'));
+  each('[data-i18n]',function(el){el.textContent=T(el.getAttribute('data-i18n'));});
+  each('[data-i18n-attr]',function(el){el.getAttribute('data-i18n-attr').split(';').forEach(function(p){var kv=p.split(':');el.setAttribute(kv[0],T(kv[1]));});});
+  each('[data-lang]',function(b){b.setAttribute('aria-pressed',b.getAttribute('data-lang')===lang?'true':'false');});
+}
+
+var SETS=[
+  {key:'X_fin_only',color:'#8C99A6',shape:'square'},
+  {key:'X_text_only',color:'#3B5BDB',shape:'circle'},
+  {key:'X_fin_plus_X_text',color:'#1F2A44',shape:'diamond'}
+];
+var SET={};SETS.forEach(function(x){SET[x.key]=x;});
+function setLabel(k){return T('set.'+k);}
+function modelName(k){return T('model.'+k);}
+function metricName(k){return T('m.'+k);}
+function rowLabel(d){return setLabel(d.feature_set)+' · '+modelName(d.model_name);}
+D.forEach(function(d,i){d.id=i;});
+var state={metric:'roc_auc',order:'group'};
+
+function groupInfo(key){var rows=D.filter(function(d){return d.feature_set===key;});var ns=rows.map(function(r){return r.n_samples;}),nf=rows.map(function(r){return r.n_features;});
+  return {rows:rows,n:ns.every(function(v){return v===ns[0];})?ns[0]:ns.join('/'),nf:nf.every(function(v){return v===nf[0];})?nf[0]:nf.join('/')};}
+function best(key,metric){return groupInfo(key).rows.reduce(function(a,b){return b[metric+'_mean']>a[metric+'_mean']?b:a;});}
+function range(key,metric){var v=groupInfo(key).rows.map(function(r){return r[metric+'_mean'];});return [Math.min.apply(null,v),Math.max.apply(null,v)];}
+
+/* KPI rail follows the selected metric */
+function renderKpis(){
+  var met=state.metric,host=$('dk-kpis');clear(host);
+  var bt=best('X_text_only',met),bc=best('X_fin_plus_X_text',met),fr=range('X_fin_only',met);
+  function card(cls,l,v,sub){var d=h('div',{class:'kpi'+(cls?' '+cls:'')},host);h('div',{class:'l'},d,l);h('div',{class:'v'},d,v);h('div',{class:'s'},d,sub);}
+  card('hl',T('kpi.text',metricName(met)),f3(bt[met+'_mean']),modelName(bt.model_name)+' · ±'+f3(bt[met+'_std']));
+  card('',T('kpi.comb',metricName(met)),f3(bc[met+'_mean']),modelName(bc.model_name)+' · ±'+f3(bc[met+'_std']));
+  card('',T('kpi.fin',metricName(met)),f3(fr[0])+'–'+f3(fr[1]),T('kpi.fin.s'));
+  card('',T('kpi.n'),groupInfo('X_fin_only').n+' / '+groupInfo('X_text_only').n,T('kpi.n.s'));
+}
+
+function renderKey(){
+  var host=$('dk-key');clear(host);
+  SETS.forEach(function(st){var sp=h('span',null,host);var k=s('svg',{width:14,height:14,viewBox:'-7 -7 14 14'},sp);mark(k,st,5.5);sp.appendChild(document.createTextNode(setLabel(st.key)));});
+  var sp=h('span',null,host);var k=s('svg',{width:26,height:14,viewBox:'0 -7 26 14'},sp);
+  s('line',{x1:1,x2:25,y1:0,y2:0,stroke:'#1F2933','stroke-width':1.5},k);s('line',{x1:1,x2:1,y1:-4,y2:4,stroke:'#1F2933','stroke-width':1.5},k);s('line',{x1:25,x2:25,y1:-4,y2:4,stroke:'#1F2933','stroke-width':1.5},k);
+  sp.appendChild(document.createTextNode(T('key.sd')));
+}
+function mark(parent,st,r){
+  var a={fill:st.color,stroke:st.color,'stroke-width':1.5};
+  if(st.shape==='circle'){a.r=r;a.cx=0;a.cy=0;return s('circle',a,parent);}
+  if(st.shape==='square'){a.x=-r*.85;a.y=-r*.85;a.width=r*1.7;a.height=r*1.7;return s('rect',a,parent);}
+  a.d='M0,'+(-r*1.15)+' L'+(r*1.15)+',0 L0,'+(r*1.15)+' L'+(-r*1.15)+',0 Z';return s('path',a,parent);
+}
+
+/* chart */
+var svg=$('dk-chart'),C=null;
+function layout(){
+  var W=Math.max(300,$('dk-chart-host').clientWidth),narrow=W<600;
+  var m={l:narrow?104:190,r:narrow?48:112,t:26,b:40},rowH=narrow?25:27,gap=narrow?28:28;
+  var H=m.t+D.length*rowH+SETS.length*gap+m.b;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width',W);svg.setAttribute('height',H);
+  var keep=[svg.querySelector('title'),svg.querySelector('desc')];clear(svg);keep.forEach(function(k){svg.appendChild(k);});
+  var gGrid=s('g',null,svg),gHead=s('g',null,svg),gRows=s('g',null,svg);
+  var heads=SETS.map(function(st){var g=s('g',{class:'mv'},gHead);var g2=groupInfo(st.key);
+    s('text',{x:0,y:0,'font-size':narrow?12:13,'font-weight':600,fill:st.color==='#8C99A6'?'#5B6B7B':st.color},g,setLabel(st.key));
+    s('text',{x:narrow?0:W-m.r+10,y:narrow?14:0,'font-size':12,fill:'#5B6B7B'},g,T('head.n',g2.n,g2.nf));
+    return {st:st,g:g};});
+  var rows=D.map(function(d){
+    var st=SET[d.feature_set];var g=s('g',{class:'mv'},gRows);
+    var lab=s('text',{x:m.l-12,y:5,'text-anchor':'end','font-size':narrow?12:14,fill:'#1F2933'},g,'');
+    var tag=s('text',{x:m.l-12,y:5,'text-anchor':'end','font-size':12,fill:'#5B6B7B','font-weight':600,class:'mv'},g,'');
+    var wl=s('line',{x1:0,x2:1,y1:0,y2:0,stroke:st.color,'stroke-width':1.6,class:'mv'},g);
+    var cL=s('line',{x1:0,x2:0,y1:-5,y2:5,stroke:st.color,'stroke-width':1.6,class:'mv'},g);
+    var cR=s('line',{x1:0,x2:0,y1:-5,y2:5,stroke:st.color,'stroke-width':1.6,class:'mv'},g);
+    var dg=s('g',{class:'mv'},g);mark(dg,st,narrow?5:6);
+    var val=s('text',{x:0,y:5,'font-size':12,fill:'#5B6B7B',class:'mv num'},g);
+    return {d:d,st:st,g:g,lab:lab,tag:tag,wl:wl,cL:cL,cR:cR,dg:dg,val:val};
+  });
+  C={W:W,H:H,m:m,rowH:rowH,gap:gap,narrow:narrow,gGrid:gGrid,heads:heads,rows:rows};
+}
+function update(){
+  var met=state.metric,m=C.m,W=C.W,H=C.H;
+  var lo=Math.min.apply(null,D.map(function(d){return d[met+'_mean']-d[met+'_std'];}));
+  var hi=Math.max.apply(null,D.map(function(d){return d[met+'_mean']+d[met+'_std'];}));
+  var d0=Math.min(0.5,Math.floor(lo*20)/20),d1=Math.min(1,Math.ceil(hi*20)/20);
+  var x=function(v){return m.l+(v-d0)/(d1-d0)*(W-m.l-m.r);};
+  clear(C.gGrid);
+  for(var t=Math.ceil(d0*20-1e-9)/20;t<=d1+1e-9;t+=0.05){
+    var tt=Math.round(t*100)/100,major=Math.abs(tt*10-Math.round(tt*10))<1e-6;
+    if(!major&&C.narrow)continue;
+    s('line',{x1:x(tt),x2:x(tt),y1:m.t-6,y2:H-m.b,stroke:major?'#E3E8EE':'#F1F4F7'},C.gGrid);
+    if(major)s('text',{x:x(tt),y:H-m.b+16,'text-anchor':'middle','font-size':12,fill:'#5B6B7B',class:'num'},C.gGrid,tt.toFixed(1));
+  }
+  s('line',{x1:x(0.5),x2:x(0.5),y1:m.t-10,y2:H-m.b,stroke:'#5B6B7B','stroke-dasharray':'3 3'},C.gGrid);
+  s('text',{x:x(0.5)+5,y:m.t-12,'font-size':12,fill:'#5B6B7B'},C.gGrid,T(met==='roc_auc'?'ref.auc':'ref.other'));
+  s('text',{x:W-m.r,y:H-6,'text-anchor':'end','font-size':12,'font-weight':600,fill:'#1F2933'},C.gGrid,T('axis',metricName(met)));
+  var order=D.slice();
+  if(state.order==='mean')order.sort(function(a,b){return b[met+'_mean']-a[met+'_mean'];});
+  var ypos={},y=m.t,headY={};
+  if(state.order==='group'){
+    SETS.forEach(function(st){headY[st.key]=y+12;y+=C.gap;order.filter(function(d){return d.feature_set===st.key;}).forEach(function(d){ypos[d.id]=y+C.rowH/2-4;y+=C.rowH;});});
+  }else{
+    y+=C.gap*0.5;order.forEach(function(d){ypos[d.id]=y+C.rowH/2;y+=C.rowH;});
+  }
+  C.heads.forEach(function(hd){
+    if(state.order==='group'){hd.g.style.opacity=1;hd.g.style.transform='translate(8px,'+headY[hd.st.key]+'px)';}
+    else hd.g.style.opacity=0;
+  });
+  C.rows.forEach(function(r){
+    var mu=r.d[met+'_mean'],sd=r.d[met+'_std'];
+    var a=x(Math.max(d0,mu-sd)),b=x(Math.min(d1,mu+sd)),xm=x(mu);
+    r.g.style.transform='translate(0px,'+ypos[r.d.id]+'px)';
+    r.wl.style.transform='translateX('+a+'px) scaleX('+Math.max(1,b-a)+')';
+    r.cL.style.transform='translateX('+a+'px)';r.cR.style.transform='translateX('+b+'px)';
+    r.dg.style.transform='translateX('+xm+'px)';
+    r.val.textContent=f3(mu)+(C.narrow?'':' ± '+f3(sd));
+    r.val.style.transform='translateX('+(b+8)+'px)';
+    var mname=C.narrow?T('short.'+r.d.model_name):modelName(r.d.model_name);
+    if(state.order==='mean'){
+      if(C.narrow){r.tag.style.opacity=0;r.lab.textContent=T('setCode.'+r.st.key)+' · '+mname;}
+      else{r.lab.textContent=mname;r.tag.textContent=T('setShort.'+r.st.key);r.tag.style.opacity=1;r.tag.style.transform='translateX(-120px)';}
+    }else{r.lab.textContent=mname;r.tag.style.opacity=0;}
+  });
+  var cap=$('dk-figcap');clear(cap);
+  cap.appendChild(document.createTextNode(T('cap',groupInfo('X_fin_only').n,groupInfo('X_text_only').n)));
+  h('a',{href:README},cap,T('nav.method'));
+  $('dk-chart-desc').textContent=T('desc',metricName(met),D.map(function(d){return [rowLabel(d),f3(d[met+'_mean']),f3(d[met+'_std'])];}));
+  renderKpis();
+}
+
+function renderTable(){
+  var tb=$('dk-table');clear(tb);
+  D.forEach(function(d){var tr=h('tr',null,tb);h('td',null,tr,setLabel(d.feature_set));h('td',null,tr,modelName(d.model_name));h('td',null,tr,String(d.n_samples));h('td',null,tr,String(d.n_features));['accuracy','f1','roc_auc'].forEach(function(k){h('td',null,tr,f3(d[k+'_mean'])+' ± '+f3(d[k+'_std']));});});
+}
+
+/* language switch re-renders with the current metric and order */
+function renderAll(){applyStatic();renderKey();renderTable();layout();update();}
+each('[data-lang]',function(b){b.addEventListener('click',function(){
+  lang=b.getAttribute('data-lang');
+  try{window.localStorage.setItem(LS_KEY,lang);}catch(e){}
+  renderAll();
+});});
+each('input[name="dk-metric"]',function(r){r.addEventListener('change',function(){state.metric=this.value;update();});});
+each('input[name="dk-order"]',function(r){r.addEventListener('change',function(){state.order=this.value;update();});});
+renderAll();
+var rt=null,lw=$('dk-chart-host').clientWidth;
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){var w=$('dk-chart-host').clientWidth;if(w!==lw){lw=w;layout();update();}},120);});
+})();
+</script>
+</body>
+</html>
